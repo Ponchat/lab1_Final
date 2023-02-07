@@ -42,7 +42,33 @@
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+typedef struct _PortPin
+{
+ GPIO_TypeDef* PORT;
+ uint16_t PIN;
+}PortPin;
 
+PortPin R[4] =
+{
+  { GPIOA, GPIO_PIN_10 },
+  { GPIOB, GPIO_PIN_3 } ,
+  { GPIOB, GPIO_PIN_5 } ,
+  { GPIOB, GPIO_PIN_4 }
+};
+
+PortPin L[4] =
+{   { GPIOA, GPIO_PIN_9 },
+  { GPIOC, GPIO_PIN_7 },
+  { GPIOB, GPIO_PIN_6 },
+  { GPIOA, GPIO_PIN_7 }
+};
+
+uint16_t ButtonMatrix = 0;
+uint16_t BttM_C = 0;
+uint16_t BttM_L = 0;
+uint16_t PUNValuable = 0;
+uint16_t state = 0;
+uint16_t ArValue[11];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -98,6 +124,168 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  static uint32_t timestamp = 0;
+	  	     if(HAL_GetTick()>=timestamp)
+	  	     {
+	  	      timestamp = HAL_GetTick() + 10;
+	  	      ReadMatrixButton_1Row();
+	  	      BttM_C = ButtonMatrix;
+
+	  	     }
+	  	     if(BttM_L == 0 && BttM_C != 0){
+	  	     	    	  PUNValuable = 1;
+	  	     	      }
+	  	     	      else{
+	  	     	    	  PUNValuable = 0;
+	  	     	      }
+	  	     	      BttM_L = BttM_C;
+	  	     switch(state)
+	  	     {
+	  	     case 0:
+	  	    	 if(ButtonMatrix == 512 & PUNValuable == 1)
+	  	    	 {
+	  	    		 ArValue[0] = 6;
+	  	    		 state = 1;
+	  	    	 }
+	  	    	 else if(ButtonMatrix != 512 & PUNValuable == 1)
+	  	    			 {
+	  	    		  state = 12;
+	  	    			 }
+	  	    	 break ;
+	  	     case 1:
+	  	    	 if(ButtonMatrix == 2 & PUNValuable == 1)
+	  	    	 {
+	  				ArValue[1] = 4;
+	  				state = 2;
+	  			 }
+	  	    	 else if (ButtonMatrix != 2 & PUNValuable == 1)
+	  	    	 {
+	  	    		 state = 12;
+	  			 }
+	  	    	 break ;
+	  	     case 2:
+	  			if (ButtonMatrix == 1024 & PUNValuable == 1) {
+	  				ArValue[2] = 3;
+	  				state = 20;
+	  			}
+	  			else if (ButtonMatrix != 1024 & PUNValuable == 1)
+	  			{
+	  				state = 12;
+	  			}
+	  			break ;
+	  		case 20:
+	  			if (ButtonMatrix == 2 & PUNValuable == 1) {
+	  				ArValue[10] = 4;
+	  				state = 3;
+	  			}
+	  			else if (ButtonMatrix != 2 & PUNValuable == 1)
+	  			{
+	  				state = 12;
+	  			}
+	  			break;
+	  		case 3:
+	  			if (ButtonMatrix == 8 & PUNValuable == 1) {
+	  				ArValue[3] = 0;
+	  				state = 4;
+	  			} else if (ButtonMatrix != 8 & PUNValuable == 1)
+	  			{
+	  				state = 12;
+	  			}
+	  			break ;
+	  		case 4:
+	  			if (ButtonMatrix == 32 & PUNValuable == 1) {
+	  				ArValue[4] = 5;
+	  				state = 5;
+	  			}
+	  			else if (ButtonMatrix != 32 & PUNValuable == 1)
+	  			{
+	  				state = 12;
+	  			}
+	  			break ;
+	  		case 5:
+	  			if (ButtonMatrix == 8 & PUNValuable == 1) {
+	  				ArValue[5] = 0;
+	  				state = 6;
+	  			}
+	  			else if (ButtonMatrix != 8 & PUNValuable == 1)
+	  			{
+	  				state = 12;
+	  			}
+	  			break ;
+	  		case 6:
+	  			if (ButtonMatrix == 8 & PUNValuable == 1) {
+	  				ArValue[6] = 0;
+	  				state = 7;
+	  			}
+	  			else if (ButtonMatrix != 8 & PUNValuable == 1)
+	  			{
+	  				state = 12;
+	  			}
+	  			break ;
+	  		case 7:
+	  			if (ButtonMatrix == 8 & PUNValuable == 1) {
+	  				ArValue[7] = 0;
+	  				state = 8;
+	  			}
+	  			else if (ButtonMatrix != 8 & PUNValuable == 1)
+	  			{
+	  				state = 12;
+	  			}
+	  			break ;
+	  		case 8:
+	  			if (ButtonMatrix == 512 & PUNValuable == 1) {
+	  				ArValue[8] = 6;
+	  				state = 9;
+	  			}
+	  			else if (ButtonMatrix != 512 & PUNValuable == 1)
+	  			{
+	  				state = 12;
+	  			}
+	  			break ;
+	  		case 9:
+	  			if (ButtonMatrix == 16 & PUNValuable == 1) {
+	  				ArValue[9] = 8;
+	  				state = 10;
+	  			} else if (ButtonMatrix != 16 & PUNValuable == 1)
+	  			{
+	  				state = 12;
+	  			}
+	  			break ;
+	  		case 10:
+	  			if (ButtonMatrix == 32768 & PUNValuable == 1)
+	  			{
+	  				state = 11;
+	  			} else if (ButtonMatrix != 32768 & PUNValuable == 1)
+	  			{
+	  				state = 12;
+	  			}
+	  			break ;
+	  		case 11:
+	  			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+	  			if (ButtonMatrix == 4096 & PUNValuable == 1)
+	  			{
+	  				state = 0;
+	  				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+	  			}
+	  			break ;
+	  		case 12:
+	  			if (ButtonMatrix == 4096 & PUNValuable == 1)
+	  			{
+	  				state = 0;
+	  				ArValue[0] = 0;
+	  				ArValue[1] = 0;
+	  				ArValue[2] = 0;
+	  				ArValue[3] = 0;
+	  				ArValue[4] = 0;
+	  				ArValue[5] = 0;
+	  				ArValue[6] = 0;
+	  				ArValue[7] = 0;
+	  				ArValue[8] = 0;
+	  				ArValue[9] = 0;
+	  				ArValue[10] = 0;
+	  			}
+	  			break ;
+	  	     }
   }
   /* USER CODE END 3 */
 }
@@ -197,7 +385,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LD2_Pin|R1_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, R2_Pin|R4_Pin|R3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -205,16 +396,59 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
+  /*Configure GPIO pins : LD2_Pin R1_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin|R1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : L4_Pin L1_Pin */
+  GPIO_InitStruct.Pin = L4_Pin|L1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : L2_Pin */
+  GPIO_InitStruct.Pin = L2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(L2_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : R2_Pin R4_Pin R3_Pin */
+  GPIO_InitStruct.Pin = R2_Pin|R4_Pin|R3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : L3_Pin */
+  GPIO_InitStruct.Pin = L3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(L3_GPIO_Port, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
+void ReadMatrixButton_1Row()
+{
+    static uint8_t X = 0;
+    register int i;
+    for (i = 0; i < 4; i++) {
+        if(HAL_GPIO_ReadPin(L[i].PORT, L[i].PIN))
+        {
+            ButtonMatrix &= ~(1 << (X * 4 + i));
+        } else
+        {
+            ButtonMatrix |= 1 << (X * 4 + i);
+        }
+    }
+    HAL_GPIO_WritePin(R[X].PORT, R[X].PIN, 1);
+    HAL_GPIO_WritePin(R[(X + 1) % 4].PORT, R[(X + 1) % 4].PIN, 0);
+    X++;
+    X %= 4;
+}
 
 /* USER CODE END 4 */
 
